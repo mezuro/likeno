@@ -18,10 +18,10 @@ require 'spec_helper'
 
 describe Likeno::Errors::RecordInvalid do
   describe 'initialize' do
-    let(:default_message){ "Record invalid" }
+    let(:default_message) { 'Record invalid' }
 
     context 'without a record' do
-      subject { Likeno::Errors::RecordInvalid.new }
+      subject { described_class.new }
 
       it 'is expected to have the default message' do
         expect(subject.message).to eq(default_message)
@@ -30,15 +30,15 @@ describe Likeno::Errors::RecordInvalid do
 
     context 'with a given record' do
       let!(:record) { mock('record') }
-      let!(:kalibro_errors) { ['Kalibro', 'Error'] }
-      subject { Likeno::Errors::RecordInvalid.new(record) }
+      let!(:likeno_errors) { %w(Likeno Error) }
+      subject { described_class.new(record) }
 
       before :each do
-        record.expects(:kalibro_errors).returns(kalibro_errors)
+        record.expects(:likeno_errors).returns(likeno_errors)
       end
 
       it 'is expected to return the default message concatenated with the errors' do
-        expect(subject.message).to eq("#{default_message}: #{kalibro_errors.join(', ')}")
+        expect(subject.message).to eq("#{default_message}: #{likeno_errors.join(', ')}")
       end
     end
   end
