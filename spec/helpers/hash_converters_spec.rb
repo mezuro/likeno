@@ -20,91 +20,87 @@ require 'helpers/hash_converters'
 include HashConverters
 
 describe HashConverters do
-  describe 'date_with_miliseconds' do
+  describe 'date_time_to_s' do
     context 'with 21/12/1995 (first Ruby publication)' do
-      it 'should return 1995-12-21T00:00:00.0/1+00:00' do
-        expect(date_with_milliseconds(DateTime.parse("21/12/1995"))).to eq("1995-12-21T00:00:00.0/1+00:00")
+      it 'is expected to return 1995-12-21T00:00:00.0/1+00:00' do
+        expect(date_time_to_s(DateTime.parse('21/12/1995'))).to eq('1995-12-21T00:00:00.0/1+00:00')
       end
     end
   end
 
   describe 'convert_to_hash' do
     context 'with a nil value' do
-      it 'should return nil' do
+      it 'returns nil' do
         expect(convert_to_hash(nil)).to be_nil
       end
     end
 
     context 'with an Array' do
-      before :each do
-        @array = []
-        @element1 = :kalibro
+      let(:array) { [] }
+      let(:element1) { :likeno }
 
-        @array << @element1
+      before :each do
+        array << element1
       end
 
-      it 'should return the Array wth its elements converted' do
-        expect(convert_to_hash(@array)[0]).to eq(@element1.to_s)
+      it 'returns the Array wth its elements converted' do
+        expect(convert_to_hash(array).first).to eq(element1.to_s)
       end
     end
 
     context 'with a Base' do
-      before :each do
-        @model = Likeno::Entities::Base.new
-      end
+      let(:model) { FactoryGirl.build(:model) }
 
-      it "should return the Base's Hash" do
-        expect(convert_to_hash(@model)).to eq(@model.to_hash)
+      it "returns the Base's Hash" do
+        expect(convert_to_hash(model)).to eq(model.to_hash)
       end
     end
 
     context 'with a DateTime' do
-      before :each do
-        @date = DateTime.parse("21/12/1995")
-      end
+      let(:date) { DateTime.parse('21/12/1995') }
 
-      it 'should return th date with miliseconds' do
-        expect(convert_to_hash(@date)).to eq(date_with_milliseconds(@date))
+      it 'returns the date with miliseconds' do
+        expect(convert_to_hash(date)).to eq(date_time_to_s(date))
       end
     end
 
-    context 'with an + infinite Float' do
-      it 'should return INF' do
-        expect(convert_to_hash(1.0/0.0)).to eq('INF')
+    context 'with a positive infinite Float' do
+      it 'returns INF' do
+        expect(convert_to_hash(1.0 / 0.0)).to eq('INF')
       end
     end
 
-    context 'with an - infinite Float' do
-      it 'should return -INF' do
-        expect(convert_to_hash(-1.0/0.0)).to eq('-INF')
+    context 'with a negative infinite Float' do
+      it 'returns -INF' do
+        expect(convert_to_hash(-1.0 / 0.0)).to eq('-INF')
       end
     end
   end
 
   describe 'field_to_hash' do
+    let(:model) { FactoryGirl.build(:model) }
+
     context 'with a nil field value' do
       before do
-        @model = Likeno::Base.new
-        @model.expects(:send).with(:field_getter).returns(nil)
+        model.expects(:send).with(:field_getter).returns(nil)
       end
 
-      it 'should return an instance of Hash' do
-        expect(@model.field_to_hash(:field_getter)).to be_a(Hash)
+      it 'returns an instance of Hash' do
+        expect(model.field_to_hash(:field_getter)).to be_a(Hash)
       end
 
-      it 'should return an empty Hash' do
-        expect(@model.field_to_hash(:field_getter)).to eq({})
+      it 'returns an empty Hash' do
+        expect(model.field_to_hash(:field_getter)).to eq({})
       end
     end
 
     context 'with a Float field value' do
       before do
-        @model = Likeno::Base.new
-        @model.expects(:send).with(:field_getter).returns(1.0)
+        model.expects(:send).with(:field_getter).returns(1.0)
       end
 
-      it 'should return an instance of Hash' do
-        expect(@model.field_to_hash(:field_getter)).to be_a(Hash)
+      it 'returns an instance of Hash' do
+        expect(model.field_to_hash(:field_getter)).to be_a(Hash)
       end
     end
   end
