@@ -1,3 +1,4 @@
+require 'active_support/inflector'
 require 'faraday_middleware'
 require 'likeno/version'
 require 'errors'
@@ -177,11 +178,11 @@ module Likeno
     def self.entity_name
       # This loop is a generic way to make this work even when the children class has a different name
       entity_class = self
-      until entity_class.name.include?("LikenoClient::Entities::") do
+      until entity_class.name.include?('Likeno::')
         entity_class = entity_class.superclass
       end
 
-      return entity_class.name.split("::").last.underscore.downcase
+      entity_class.name.split('::').last.underscore.downcase
     end
 
     def without_request_error?(&block)
