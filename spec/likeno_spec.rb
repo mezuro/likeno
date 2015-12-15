@@ -37,8 +37,22 @@ describe Likeno::Base do
   end
 
   describe 'client' do
-    it 'returns a Faraday::Connection' do
-      expect { described_class.client }.to raise_error(NotImplementedError)
+    context 'without a defined address' do
+      it 'raises a NotImplementedError' do
+        expect { described_class.client }.to raise_error(NotImplementedError)
+      end
+    end
+
+    context 'with a defined address' do
+      let(:address) { 'http://localhost:3000' }
+
+      before do
+        described_class.expects(:address).returns(address)
+      end
+
+      it 'returns a Faraday::Connection' do
+        expect(described_class.client).to be_a(Faraday::Connection)
+      end
     end
   end
 
