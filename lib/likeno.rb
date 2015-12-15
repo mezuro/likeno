@@ -85,19 +85,13 @@ module Likeno
       end
     end
 
-    def ==(another)
-      unless self.class == another.class
-        return false
+    def ==(other)
+      return false unless self.class == other.class
+      variable_names.each do |name|
+        next if %w(created_at updated_at persisted).include? name
+        return false unless send("#{name}") == other.send("#{name}")
       end
-
-      self.variable_names.each do |name|
-        next if name == "created_at" or name == "updated_at" or name == "persisted"
-        unless self.send("#{name}") == another.send("#{name}") then
-          return false
-        end
-      end
-
-      return true
+      true
     end
 
     def self.exists?(id)
