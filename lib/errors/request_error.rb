@@ -3,7 +3,7 @@ module Likeno
     class RequestError < Standard
       attr_reader :response
 
-      def initialize(attributes={})
+      def initialize(attributes = {})
         @response = attributes[:response]
       end
     end
