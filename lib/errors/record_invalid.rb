@@ -6,7 +6,7 @@ module Likeno
       def initialize(record = nil)
         if record
           @record = record
-          errors = @record.kalibro_errors.join(', ')
+          errors = @record.likeno_errors.join(', ')
           message = "Record invalid: #{errors}"
         else
           message = 'Record invalid'
