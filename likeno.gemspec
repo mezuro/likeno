@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mocha'
 
   spec.add_dependency 'faraday_middleware'
+  spec.add_dependency 'activesupport', '>= 2.2.1'
 end
