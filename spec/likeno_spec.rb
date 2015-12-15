@@ -118,7 +118,7 @@ describe Likeno::Base do
           Faraday::Adapter::Test::Stubs.new do |stub|
             # stub.get receives arguments: path, headers, block
             # The block should be a Array [status, headers, body]
-            stub.get('/bases/1') { [422, {}, { 'errors' => 'RecordNotFound' }] }
+            stub.get('/bases/1') { [404, {}, { 'errors' => 'RecordNotFound' }] }
           end
         end
         let!(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
