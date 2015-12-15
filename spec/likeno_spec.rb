@@ -235,27 +235,27 @@ describe Likeno::Base do
       context 'with a single error' do
         let(:errors) { "error" }
 
-        it 'is expected to set the kalibro_errors field' do
+        it 'is expected to set the likeno_errors field' do
           expect(subject.send(method_name)).to eq(false)
-          expect(subject.kalibro_errors).to eq([errors])
+          expect(subject.likeno_errors).to eq([errors])
         end
       end
 
       context 'with an array of errors' do
         let(:errors) { ["error_1", "error_2"] }
 
-        it 'is expected to set the kalibro_errors field' do
+        it 'is expected to set the likeno_errors field' do
           expect(subject.send(method_name)).to eq(false)
-          expect(subject.kalibro_errors).to eq(errors)
+          expect(subject.likeno_errors).to eq(errors)
         end
       end
 
       context 'with no error message at all' do
         let(:errors) { nil }
 
-        it 'is expected to set the kalibro_errors field' do
+        it 'is expected to set the likeno_errors field' do
           expect(subject.send(method_name)).to eq(false)
-          expect(subject.kalibro_errors.first).to be_a(Likeno::Errors::RequestError)
+          expect(subject.likeno_errors.first).to be_a(Likeno::Errors::RequestError)
         end
       end
     end
@@ -274,7 +274,7 @@ describe Likeno::Base do
         it 'is expected to make a request to save model with id and return true without errors' do
           expect(subject.save).to be(true)
           expect(subject.id).to eq(42)
-          expect(subject.kalibro_errors).to be_empty
+          expect(subject.likeno_errors).to be_empty
         end
       end
 
@@ -358,7 +358,7 @@ describe Likeno::Base do
 
       it 'is expected to remain with the errors array empty and not persisted' do
         subject.destroy
-        expect(subject.kalibro_errors).to be_empty
+        expect(subject.likeno_errors).to be_empty
         expect(subject.persisted?).to eq(false)
       end
     end
@@ -371,7 +371,7 @@ describe Likeno::Base do
     end
 
     it 'is expected to call save and raise RecordInvalid when saving fails' do
-      subject.expects(:kalibro_errors).returns(['test1', 'test2'])
+      subject.expects(:likeno_errors).returns %w(test1 test2)
       subject.expects(:save).returns(false)
 
       expect { subject.save! }.to raise_error { |error|
@@ -456,28 +456,22 @@ describe Likeno::Base do
     end
   end
 
-  describe 'is_valid?' do
+  describe 'valid?' do
     context 'with a global var' do
       it 'is expected to return false' do
-        expect(described_class.is_valid?('@test')).to be_falsey
+        expect(described_class.valid?('@test')).to be_falsey
       end
     end
 
     context 'with the attributes var' do
       it 'is expected to return false' do
-        expect(described_class.is_valid?(:attributes!)).to be_falsey
-      end
-    end
-
-    context 'with a xsi var' do
-      it 'is expected to return false' do
-        expect(described_class.is_valid?('test_xsi')).to be_falsey
+        expect(described_class.valid?(:attributes!)).to be_falsey
       end
     end
 
     context 'with a valid var' do
       it 'is expected to return true' do
-        expect(described_class.is_valid?('test')).to be_truthy
+        expect(described_class.valid?('test')).to be_truthy
       end
     end
   end
