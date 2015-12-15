@@ -204,8 +204,8 @@ describe Likeno::Base do
 
     context 'when a record does not exist with given id' do
       before :each do
-        subject.class.expects(:request).with(url, params, http_method, '').
-          raises(Likeno::Errors::RecordNotFound)
+        subject.class.expects(:request).with(url, params, http_method, '')
+          .raises(Likeno::Errors::RecordNotFound)
       end
 
       it 'is expected to raise a RecordNotFound error' do
@@ -233,7 +233,7 @@ describe Likeno::Base do
       end
 
       context 'with a single error' do
-        let(:errors) { "error" }
+        let(:errors) { 'error' }
 
         it 'is expected to set the likeno_errors field' do
           expect(subject.send(method_name)).to eq(false)
@@ -242,7 +242,7 @@ describe Likeno::Base do
       end
 
       context 'with an array of errors' do
-        let(:errors) { ["error_1", "error_2"] }
+        let(:errors) { %w(error_1 error_2) }
 
         it 'is expected to set the likeno_errors field' do
           expect(subject.send(method_name)).to eq(false)
@@ -267,8 +267,8 @@ describe Likeno::Base do
     context 'with a successful response' do
       context 'when it is not persisted' do
         before :each do
-          subject.class.expects(:request).at_least_once.with('', anything, :post, '').
-            returns({ "base" => { 'id' => 42, 'errors' => [] } })
+          subject.class.expects(:request).at_least_once.with('', anything, :post, '')
+            .returns('base' => { 'id' => 42, 'errors' => [] })
         end
 
         it 'is expected to make a request to save model with id and return true without errors' do
@@ -299,8 +299,8 @@ describe Likeno::Base do
         id = 42
 
         subject.expects(:id).at_least_once.returns(id)
-        described_class.expects(:request).with(':id', has_entry(id: id), :put, '').
-          returns({ "base" => { 'id' => id, 'errors' => [] }})
+        described_class.expects(:request).with(':id', has_entry(id: id), :put, '')
+          .returns('base' => { 'id' => id, 'errors' => [] })
       end
 
       it 'is expected to return true' do
@@ -312,10 +312,10 @@ describe Likeno::Base do
   describe 'create' do
     before :each do
       subject.expects(:save)
-      described_class.
-        expects(:new).
-        with({}).
-        returns(subject)
+      described_class
+        .expects(:new)
+        .with({})
+        .returns(subject)
     end
 
     it 'is expected to instantiate and save the model' do
@@ -326,8 +326,8 @@ describe Likeno::Base do
   describe 'find' do
     context 'with an inexistent id' do
       before :each do
-        subject.class.expects(:request).at_least_once.with(':id', has_entry(id: 0), :get).
-          raises(Likeno::Errors::RecordNotFound)
+        subject.class.expects(:request).at_least_once.with(':id', has_entry(id: 0), :get)
+          .raises(Likeno::Errors::RecordNotFound)
       end
 
       it 'is expected to raise a RecordNotFound error' do
@@ -337,8 +337,8 @@ describe Likeno::Base do
 
     context 'with an existent id' do
       before :each do
-        subject.class.expects(:request).with(':id', has_entry(id: 42), :get).
-          returns("base" => { 'id' => 42 })
+        subject.class.expects(:request).with(':id', has_entry(id: 42), :get)
+          .returns('base' => { 'id' => 42 })
       end
 
       it 'is expected to return an empty model' do
@@ -395,9 +395,9 @@ describe Likeno::Base do
       let(:another_model) { FactoryGirl.build(:model) }
 
       before :each do
-        subject.expects(:variable_names).returns(["answer"])
-        subject.expects(:send).with("answer").returns(42)
-        another_model.expects(:send).with("answer").returns(41)
+        subject.expects(:variable_names).returns(['answer'])
+        subject.expects(:send).with('answer').returns(42)
+        another_model.expects(:send).with('answer').returns(41)
       end
 
       it 'is expected to return false' do
@@ -415,10 +415,10 @@ describe Likeno::Base do
   describe 'exists?' do
     context 'with an inexistent id' do
       before :each do
-        described_class.
-          expects(:request).
-          with(':id/exists', { id: 0 }, :get).
-          returns({ 'exists' => false })
+        described_class
+          .expects(:request)
+          .with(':id/exists', { id: 0 }, :get)
+          .returns('exists' => false)
       end
 
       it 'is expected to return false' do
@@ -428,10 +428,10 @@ describe Likeno::Base do
 
     context 'with an existent id' do
       before :each do
-        described_class.
-          expects(:request).
-          with(':id/exists', { id: 42 }, :get).
-          returns({ 'exists' => true })
+        described_class
+          .expects(:request)
+          .with(':id/exists', { id: 42 }, :get)
+          .returns('exists' => true)
       end
 
       it 'is expected to return false' do
@@ -445,13 +445,13 @@ describe Likeno::Base do
 
     context 'with nil' do
       it 'is expected to return an empty array' do
-        expect(described_class.create_objects_array_from_hash("bases" => [])).to eq([])
+        expect(described_class.create_objects_array_from_hash('bases' => [])).to eq([])
       end
     end
 
     context 'with a Hash' do
       it 'is expected to return the correspondent object to the given hash inside of an Array' do
-        expect(described_class.create_objects_array_from_hash("bases" => {})).to eq([subject])
+        expect(described_class.create_objects_array_from_hash('bases' => {})).to eq([subject])
       end
     end
   end
