@@ -69,16 +69,16 @@ module Likeno
 
     def save!
       return true if save
-      raise LikenoClient::Errors::RecordInvalid.new(self)
+      raise Likeno::Errors::RecordInvalid.new(self)
     end
 
-    def self.create(attributes={})
+    def self.create(attributes = {})
       new_model = new attributes
       new_model.save
       new_model
     end
 
-    def update(attributes={})
+    def update(attributes = {})
       attributes.each { |field, value| send("#{field}=", value) if self.class.valid?(field) }
       without_request_error? do
         self.class.request(update_action, update_params, :put, update_prefix)
@@ -142,10 +142,10 @@ module Likeno
 
     # TODO: probably the connection could be a class static variable.
     def self.client
-      Faraday.new(:url => LikenoClient.config[address]) do |conn|
+      Faraday.new(url: address) do |conn|
         conn.request :json
-        conn.response :json, :content_type => /\bjson$/
-        conn.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+        conn.response :json, content_type: /\bjson$/
+        conn.adapter Faraday.default_adapter # make requests with Net::HTTP
       end
     end
 
@@ -180,25 +180,23 @@ module Likeno
     end
 
     def without_request_error?(&block)
-      begin
-        block.call
-        true
-      rescue LikenoClient::Errors::RecordNotFound => error
-        raise error
-      rescue LikenoClient::Errors::RequestError => error
-        raise error if error.response.status.between?(500, 599)
+      block.call
+      true
+    rescue Likeno::Errors::RecordNotFound => error
+      raise error
+    rescue Likeno::Errors::RequestError => error
+      raise error if error.response.status.between?(500, 599)
 
-        response_errors = error.response.body['errors']
-        if response_errors.is_a?(Array)
-          response_errors.each { |error_msg| add_error(error_msg) }
-        elsif !response_errors.nil?
-          add_error response_errors
-        else
-          add_error error
-        end
-
-        false
+      response_errors = error.response.body['errors']
+      if response_errors.is_a?(Array)
+        response_errors.each { |error_msg| add_error(error_msg) }
+      elsif !response_errors.nil?
+        add_error response_errors
+      else
+        add_error error
       end
+
+      false
     end
 
     include HashConverters
