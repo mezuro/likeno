@@ -5,7 +5,7 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -16,49 +16,49 @@
 
 module RequestMethods
   def save_params
-    {instance_class_name.underscore.to_sym => self.to_hash}
+    { instance_entity_name.underscore.to_sym => to_hash }
   end
 
   def save_action
-    ""
+    ''
   end
 
   def save_prefix
-    ""
+    ''
   end
 
   def destroy_action
-    ":id"
+    ':id'
   end
   alias_method :update_action, :destroy_action
 
   def destroy_params
-    {id: self.id}
+    { id: id }
   end
 
   def destroy_prefix
-    ""
+    ''
   end
 
   def update_params
-    {instance_class_name.underscore.to_sym => self.to_hash, :id => self.id}
+    { instance_entity_name.underscore.to_sym => to_hash, :id => id }
   end
 
   def update_prefix
-    ""
+    ''
   end
 
   module ClassMethods
     def exists_action
-      ":id/exists"
+      ':id/exists'
     end
 
     def id_params(id)
-      {id: id}
+      { id: id }
     end
 
     def find_action
-      ":id"
+      ':id'
     end
   end
 end

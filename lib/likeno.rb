@@ -59,9 +59,9 @@ module Likeno
         without_request_error? do
           response = self.class.request(save_action, save_params, :post, save_prefix)
 
-          self.id = response[instance_class_name]["id"]
-          self.created_at = response[instance_class_name]["created_at"] unless response[instance_class_name]["created_at"].nil?
-          self.updated_at = response[instance_class_name]["updated_at"] unless response[instance_class_name]["updated_at"].nil?
+          self.id = response[instance_entity_name]["id"]
+          self.created_at = response[instance_entity_name]["created_at"] unless response[instance_entity_name]["created_at"].nil?
+          self.updated_at = response[instance_entity_name]["updated_at"] unless response[instance_entity_name]["updated_at"].nil?
           @persisted = true
         end
       end
@@ -153,8 +153,7 @@ module Likeno
       field.to_s[0] != '@' && (field =~ /attributes!/).nil? && (field.to_s =~ /errors/).nil?
     end
 
-    # TODO rename to instance_entity_name
-    def instance_class_name
+    def instance_entity_name
       self.class.entity_name
     end
 
