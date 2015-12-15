@@ -14,7 +14,7 @@ describe Likeno::Base do
     subject { described_class.new({}) }
 
     it 'is expected to create a model from an empty hash' do
-      expect(subject.kalibro_errors).to eq([])
+      expect(subject.likeno_errors).to eq([])
     end
   end
 
