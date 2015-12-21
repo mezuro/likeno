@@ -3,12 +3,12 @@ require 'spec_helper'
 # Create a class that has the attribute assignment methods, since some methods expect they exist
 # (and usually the subclasses do that).
 
-class BaseTest < Likeno::Base
+class EntityTest < Likeno::Entity
   attr_accessor :id, :created_at, :updated_at
 end
 
-describe Likeno::Base do
-  subject { BaseTest.new }
+describe Likeno::Entity do
+  subject { EntityTest.new }
 
   describe 'new' do
     subject { described_class.new({}) }
@@ -23,8 +23,8 @@ describe Likeno::Base do
       expect(subject.class.entity_name).to be_a(String)
     end
 
-    it 'is expected to return Base' do
-      expect(subject.class.entity_name).to eq('base')
+    it 'is expected to return Entity' do
+      expect(subject.class.entity_name).to eq('entity')
     end
   end
 
@@ -59,14 +59,14 @@ describe Likeno::Base do
   describe 'request' do
     context 'with successful responses' do
       let(:exists_response) { { 'exists' => false } }
-      let(:bases_response) { { 'bases' => { 'id' => 1 } } }
-      let(:prefix_bases_response) { { 'bases' => { 'id' => 2 } } }
+      let(:entities_response) { { 'entities' => { 'id' => 1 } } }
+      let(:prefix_entities_response) { { 'entities' => { 'id' => 2 } } }
       let(:faraday_stubs) { Faraday::Adapter::Test::Stubs.new }
       let(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
 
       before :each do
         subject.class.expects(:client).at_least_once.returns(connection)
-        subject.class.expects(:endpoint).at_least_once.returns('bases')
+        subject.class.expects(:endpoint).at_least_once.returns('entities')
       end
 
       after :each do
@@ -78,9 +78,9 @@ describe Likeno::Base do
           it 'is expected to make the request without the prefix' do
             # stub.get receives arguments: path, headers, block
             # The block should be a Array [status, headers, body]
-            faraday_stubs.get('/bases/') { [200, {}, bases_response] }
+            faraday_stubs.get('/entities/') { [200, {}, entities_response] }
             response = subject.class.request('', {}, :get)
-            expect(response).to eq(bases_response)
+            expect(response).to eq(entities_response)
           end
         end
 
@@ -88,9 +88,9 @@ describe Likeno::Base do
           it 'is expected to make the request with the prefix' do
             # stub.get receives arguments: path, headers, block
             # The block should be a Array [status, headers, body]
-            faraday_stubs.get('/prefix/bases/') { [200, {}, prefix_bases_response] }
+            faraday_stubs.get('/prefix/entities/') { [200, {}, prefix_entities_response] }
             response = subject.class.request('', {}, :get, 'prefix')
-            expect(response).to eq(prefix_bases_response)
+            expect(response).to eq(prefix_entities_response)
           end
         end
       end
@@ -99,7 +99,7 @@ describe Likeno::Base do
         it 'is expected to make the request with the id included' do
           # stub.get receives arguments: path, headers, block
           # The block should be a Array [status, headers, body]
-          faraday_stubs.get('/bases/1/exists') { [200, {}, exists_response] }
+          faraday_stubs.get('/entities/1/exists') { [200, {}, exists_response] }
           response = subject.class.request(':id/exists', { id: 1 }, :get)
           expect(response).to eq(exists_response)
         end
@@ -112,7 +112,7 @@ describe Likeno::Base do
           Faraday::Adapter::Test::Stubs.new do |stub|
             # stub.get receives arguments: path, headers, block
             # The block should be a Array [status, headers, body]
-            stub.get('/bases/1') { [404, {}, {}] }
+            stub.get('/entities/1') { [404, {}, {}] }
           end
         end
         let!(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
@@ -132,7 +132,7 @@ describe Likeno::Base do
           Faraday::Adapter::Test::Stubs.new do |stub|
             # stub.get receives arguments: path, headers, block
             # The block should be a Array [status, headers, body]
-            stub.get('/bases/1') { [404, {}, { 'errors' => 'RecordNotFound' }] }
+            stub.get('/entities/1') { [404, {}, { 'errors' => 'RecordNotFound' }] }
           end
         end
         let!(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
@@ -149,7 +149,7 @@ describe Likeno::Base do
     end
 
     context 'with an unsuccessful request' do
-      let!(:stubs) { Faraday::Adapter::Test::Stubs.new { |stub| stub.get('/bases/1/exists') { [500, {}, {}] } } }
+      let!(:stubs) { Faraday::Adapter::Test::Stubs.new { |stub| stub.get('/entities/1/exists') { [500, {}, {}] } } }
       let(:connection) { Faraday.new { |builder| builder.adapter :test, stubs } }
 
       before :each do
@@ -268,7 +268,7 @@ describe Likeno::Base do
       context 'when it is not persisted' do
         before :each do
           subject.class.expects(:request).at_least_once.with('', anything, :post, '')
-            .returns('base' => { 'id' => 42, 'errors' => [] })
+            .returns('entity' => { 'id' => 42, 'errors' => [] })
         end
 
         it 'is expected to make a request to save model with id and return true without errors' do
@@ -300,7 +300,7 @@ describe Likeno::Base do
 
         subject.expects(:id).at_least_once.returns(id)
         described_class.expects(:request).with(':id', has_entry(id: id), :put, '')
-          .returns('base' => { 'id' => id, 'errors' => [] })
+          .returns('entity' => { 'id' => id, 'errors' => [] })
       end
 
       it 'is expected to return true' do
@@ -338,7 +338,7 @@ describe Likeno::Base do
     context 'with an existent id' do
       before :each do
         subject.class.expects(:request).with(':id', has_entry(id: 42), :get)
-          .returns('base' => { 'id' => 42 })
+          .returns('entity' => { 'id' => 42 })
       end
 
       it 'is expected to return an empty model' do
@@ -445,13 +445,13 @@ describe Likeno::Base do
 
     context 'with nil' do
       it 'is expected to return an empty array' do
-        expect(described_class.create_objects_array_from_hash('bases' => [])).to eq([])
+        expect(described_class.create_objects_array_from_hash('entities' => [])).to eq([])
       end
     end
 
     context 'with a Hash' do
       it 'is expected to return the correspondent object to the given hash inside of an Array' do
-        expect(described_class.create_objects_array_from_hash('bases' => {})).to eq([subject])
+        expect(described_class.create_objects_array_from_hash('entities' => {})).to eq([subject])
       end
     end
   end
