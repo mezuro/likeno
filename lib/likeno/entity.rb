@@ -2,7 +2,7 @@ require 'active_support/inflector'
 require 'faraday_middleware'
 require 'errors'
 require 'helpers/hash_converters'
-require 'helpers/request_methods'
+require 'helpers/crud_request_parameters'
 
 module Likeno
   class Entity
@@ -156,8 +156,8 @@ module Likeno
       self.class.entity_name
     end
 
-    include RequestMethods
-    extend RequestMethods::ClassMethods
+    include CRUDRequestParameters
+    extend CRUDRequestParameters::ClassMethods
 
     def add_error(exception)
       @likeno_errors << exception
