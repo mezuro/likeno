@@ -2,6 +2,7 @@ require 'active_support/inflector'
 require 'faraday_middleware'
 require 'errors'
 require 'helpers/hash_converters'
+require 'helpers/request_methods'
 require 'helpers/crud_request_parameters'
 
 module Likeno
@@ -23,24 +24,7 @@ module Likeno
       hash
     end
 
-    def self.request(action, params = {}, method = :post, prefix = '')
-      response = client.send(method) do |request|
-        url = "/#{endpoint}/#{action}".gsub(':id', params[:id].to_s)
-        url = "/#{prefix}#{url}" unless prefix.empty?
-        request.url url
-        request.body = params unless method == :get || params.empty?
-        request.options.timeout = 300
-        request.options.open_timeout = 300
-      end
-
-      if response.success?
-        response.body
-      elsif response.status == 404
-        raise Likeno::Errors::RecordNotFound.new(response: response)
-      else
-        raise Likeno::Errors::RequestError.new(response: response)
-      end
-    end
+    extend RequestMethods
 
     def self.to_object(value)
       value.is_a?(Hash) ? new(value, true) : value
@@ -125,10 +109,6 @@ module Likeno
       self.class.entity_name
     end
 
-    def self.module_name
-      raise NotImplementedError
-    end
-
     protected
 
     def instance_variable_names
@@ -143,19 +123,6 @@ module Likeno
       instance_variable_names.each.collect { |variable| variable.to_s.sub(/@/, '') }
     end
 
-    def self.address
-      raise NotImplementedError
-    end
-
-    # TODO: probably the connection could be a class static variable.
-    def self.client
-      Faraday.new(url: address) do |conn|
-        conn.request :json
-        conn.response :json, content_type: /\bjson$/
-        conn.adapter Faraday.default_adapter # make requests with Net::HTTP
-      end
-    end
-
     def self.valid?(field)
       field.to_s[0] != '@' && (field =~ /attributes!/).nil? && (field.to_s =~ /errors/).nil?
     end
@@ -165,20 +132,6 @@ module Likeno
 
     def add_error(exception)
       @likeno_errors << exception
-    end
-
-    def self.endpoint
-      entity_name.pluralize
-    end
-
-    def self.entity_name
-      # This loop is a generic way to make this work even when the children class has a different name
-      entity_class = self
-      until entity_class.name.include?("#{module_name}::")
-        entity_class = entity_class.superclass
-      end
-
-      entity_class.name.split('::').last.underscore.downcase
     end
 
     def without_request_error?(&block)
