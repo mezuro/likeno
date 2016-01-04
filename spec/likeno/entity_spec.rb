@@ -19,6 +19,10 @@ describe Likeno::Entity do
   end
 
   describe 'entity_name' do
+    before :each do
+      subject.class.expects(:module_name).twice.returns('Likeno')
+    end
+
     it 'is expected to be a String' do
       expect(subject.class.entity_name).to be_a(String)
     end
@@ -119,6 +123,7 @@ describe Likeno::Entity do
 
         before :each do
           described_class.expects(:client).at_least_once.returns(connection)
+          described_class.expects(:endpoint).at_least_once.returns('entities')
         end
 
         it 'is expected to raise a RecordNotFound error' do
@@ -139,6 +144,7 @@ describe Likeno::Entity do
 
         before :each do
           described_class.expects(:client).at_least_once.returns(connection)
+          described_class.expects(:endpoint).at_least_once.returns('entities')
         end
 
         it 'is expected to raise a RecordNotFound error' do
@@ -154,6 +160,7 @@ describe Likeno::Entity do
 
       before :each do
         subject.class.expects(:client).at_least_once.returns(connection)
+        subject.class.expects(:endpoint).at_least_once.returns('entities')
       end
 
       it 'is expected to raise a RequestError with the response' do
@@ -262,11 +269,18 @@ describe Likeno::Entity do
   end
 
   describe 'save' do
-    it_behaves_like 'persistence method', :save, :post, false # false means Don't use ids in URLs
+    context 'persistance' do
+      before :each do
+        subject.expects(:instance_entity_name).at_least_once.returns('entity')
+      end
+
+      it_behaves_like 'persistence method', :save, :post, false # false means Don't use ids in URLs
+    end
 
     context 'with a successful response' do
       context 'when it is not persisted' do
         before :each do
+          subject.expects(:instance_entity_name).at_least_once.returns('entity')
           subject.class.expects(:request).at_least_once.with('', anything, :post, '')
             .returns('entity' => { 'id' => 42, 'errors' => [] })
         end
@@ -292,6 +306,10 @@ describe Likeno::Entity do
   end
 
   describe 'update' do
+    before :each do
+      subject.expects(:instance_entity_name).at_least_once.returns('entity')
+    end
+
     it_behaves_like 'persistence method', :update, :put
 
     context 'with valid parameters' do
@@ -337,6 +355,7 @@ describe Likeno::Entity do
 
     context 'with an existent id' do
       before :each do
+        subject.class.expects(:entity_name).at_least_once.returns('entity')
         subject.class.expects(:request).with(':id', has_entry(id: 42), :get)
           .returns('entity' => { 'id' => 42 })
       end
@@ -444,12 +463,20 @@ describe Likeno::Entity do
     subject { FactoryGirl.build(:model) }
 
     context 'with nil' do
+      before :each do
+        described_class.expects(:entity_name).at_least_once.returns('entity')
+      end
+
       it 'is expected to return an empty array' do
         expect(described_class.create_objects_array_from_hash('entities' => [])).to eq([])
       end
     end
 
     context 'with a Hash' do
+      before :each do
+        described_class.expects(:entity_name).at_least_once.returns('entity')
+      end
+
       it 'is expected to return the correspondent object to the given hash inside of an Array' do
         expect(described_class.create_objects_array_from_hash('entities' => {})).to eq([subject])
       end
@@ -473,6 +500,19 @@ describe Likeno::Entity do
       it 'is expected to return true' do
         expect(described_class.valid?('test')).to be_truthy
       end
+    end
+  end
+
+  describe 'instance_entity_name' do
+    it 'is expected to call its class equivalent method' do
+      subject.class.expects(:entity_name).returns('entities')
+      expect(subject.instance_entity_name)
+    end
+  end
+
+  describe 'module_name' do
+    it 'is expected to raise a NotImplemented error' do
+      expect {subject.class.module_name}.to raise_error NotImplementedError
     end
   end
 end

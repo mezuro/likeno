@@ -121,6 +121,14 @@ module Likeno
 
     alias_method :persisted?, :persisted
 
+    def instance_entity_name
+      self.class.entity_name
+    end
+
+    def self.module_name
+      raise NotImplementedError
+    end
+
     protected
 
     def instance_variable_names
@@ -152,10 +160,6 @@ module Likeno
       field.to_s[0] != '@' && (field =~ /attributes!/).nil? && (field.to_s =~ /errors/).nil?
     end
 
-    def instance_entity_name
-      self.class.entity_name
-    end
-
     include CRUDRequestParameters
     extend CRUDRequestParameters::ClassMethods
 
@@ -170,7 +174,7 @@ module Likeno
     def self.entity_name
       # This loop is a generic way to make this work even when the children class has a different name
       entity_class = self
-      until entity_class.name.include?('Likeno::')
+      until entity_class.name.include?("#{module_name}::")
         entity_class = entity_class.superclass
       end
 
