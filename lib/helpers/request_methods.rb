@@ -1,64 +1,51 @@
-# This file is part of KalibroClient
-# Copyright (C) 2013  it's respectives authors (please see the AUTHORS file)
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 module RequestMethods
-  def save_params
-    { instance_entity_name.underscore.to_sym => to_hash }
-  end
-
-  def save_action
-    ''
-  end
-
-  def save_prefix
-    ''
-  end
-
-  def destroy_action
-    ':id'
-  end
-  alias_method :update_action, :destroy_action
-
-  def destroy_params
-    { id: id }
-  end
-
-  def destroy_prefix
-    ''
-  end
-
-  def update_params
-    { instance_entity_name.underscore.to_sym => to_hash, :id => id }
-  end
-
-  def update_prefix
-    ''
-  end
-
-  module ClassMethods
-    def exists_action
-      ':id/exists'
+  def request(action, params = {}, method = :post, prefix = '')
+    response = client.send(method) do |request|
+      url = "/#{endpoint}/#{action}".gsub(':id', params[:id].to_s)
+      url = "/#{prefix}#{url}" unless prefix.empty?
+      request.url url
+      request.body = params unless method == :get || params.empty?
+      request.options.timeout = 300
+      request.options.open_timeout = 300
     end
 
-    def id_params(id)
-      { id: id }
+    if response.success?
+      response.body
+    elsif response.status == 404
+      raise Likeno::Errors::RecordNotFound.new(response: response)
+    else
+      raise Likeno::Errors::RequestError.new(response: response)
+    end
+  end
+
+  def address
+    raise NotImplementedError
+  end
+
+  # TODO: probably the connection could be a class static variable.
+  def client
+    Faraday.new(url: address) do |conn|
+      conn.request :json
+      conn.response :json, content_type: /\bjson$/
+      conn.adapter Faraday.default_adapter # make requests with Net::HTTP
+    end
+  end
+
+  def endpoint
+    entity_name.pluralize
+  end
+
+  def module_name
+    raise NotImplementedError
+  end
+
+  def entity_name
+    # This loop is a generic way to make this work even when the children class has a different name
+    entity_class = self
+    until entity_class.name.include?("#{module_name}::")
+      entity_class = entity_class.superclass
     end
 
-    def find_action
-      ':id'
-    end
+    entity_class.name.split('::').last.underscore.downcase
   end
 end

@@ -18,155 +18,6 @@ describe Likeno::Entity do
     end
   end
 
-  describe 'entity_name' do
-    it 'is expected to be a String' do
-      expect(subject.class.entity_name).to be_a(String)
-    end
-
-    it 'is expected to return Entity' do
-      expect(subject.class.entity_name).to eq('entity')
-    end
-  end
-
-  describe 'endpoint' do
-    it 'is expected to return the entity_name' do
-      endpoint = 'tests'
-      described_class.expects(:entity_name).returns(endpoint)
-      expect(described_class.endpoint).to eq(endpoint)
-    end
-  end
-
-  describe 'client' do
-    context 'without a defined address' do
-      it 'raises a NotImplementedError' do
-        expect { described_class.client }.to raise_error(NotImplementedError)
-      end
-    end
-
-    context 'with a defined address' do
-      let(:address) { 'http://localhost:3000' }
-
-      before do
-        described_class.expects(:address).returns(address)
-      end
-
-      it 'returns a Faraday::Connection' do
-        expect(described_class.client).to be_a(Faraday::Connection)
-      end
-    end
-  end
-
-  describe 'request' do
-    context 'with successful responses' do
-      let(:exists_response) { { 'exists' => false } }
-      let(:entities_response) { { 'entities' => { 'id' => 1 } } }
-      let(:prefix_entities_response) { { 'entities' => { 'id' => 2 } } }
-      let(:faraday_stubs) { Faraday::Adapter::Test::Stubs.new }
-      let(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
-
-      before :each do
-        subject.class.expects(:client).at_least_once.returns(connection)
-        subject.class.expects(:endpoint).at_least_once.returns('entities')
-      end
-
-      after :each do
-        faraday_stubs.verify_stubbed_calls
-      end
-
-      context 'without an id parameter' do
-        context 'without a prefix' do
-          it 'is expected to make the request without the prefix' do
-            # stub.get receives arguments: path, headers, block
-            # The block should be a Array [status, headers, body]
-            faraday_stubs.get('/entities/') { [200, {}, entities_response] }
-            response = subject.class.request('', {}, :get)
-            expect(response).to eq(entities_response)
-          end
-        end
-
-        context 'with a prefix' do
-          it 'is expected to make the request with the prefix' do
-            # stub.get receives arguments: path, headers, block
-            # The block should be a Array [status, headers, body]
-            faraday_stubs.get('/prefix/entities/') { [200, {}, prefix_entities_response] }
-            response = subject.class.request('', {}, :get, 'prefix')
-            expect(response).to eq(prefix_entities_response)
-          end
-        end
-      end
-
-      context 'with an id parameter' do
-        it 'is expected to make the request with the id included' do
-          # stub.get receives arguments: path, headers, block
-          # The block should be a Array [status, headers, body]
-          faraday_stubs.get('/entities/1/exists') { [200, {}, exists_response] }
-          response = subject.class.request(':id/exists', { id: 1 }, :get)
-          expect(response).to eq(exists_response)
-        end
-      end
-    end
-
-    context 'when the record was not found' do
-      context 'and or the status is 404' do
-        let!(:faraday_stubs) do
-          Faraday::Adapter::Test::Stubs.new do |stub|
-            # stub.get receives arguments: path, headers, block
-            # The block should be a Array [status, headers, body]
-            stub.get('/entities/1') { [404, {}, {}] }
-          end
-        end
-        let!(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
-
-        before :each do
-          described_class.expects(:client).at_least_once.returns(connection)
-        end
-
-        it 'is expected to raise a RecordNotFound error' do
-          expect { described_class.request(':id', { id: 1 }, :get) }.to raise_error(Likeno::Errors::RecordNotFound)
-          faraday_stubs.verify_stubbed_calls
-        end
-      end
-
-      context 'and or the response has a NotFound error message' do
-        let!(:faraday_stubs) do
-          Faraday::Adapter::Test::Stubs.new do |stub|
-            # stub.get receives arguments: path, headers, block
-            # The block should be a Array [status, headers, body]
-            stub.get('/entities/1') { [404, {}, { 'errors' => 'RecordNotFound' }] }
-          end
-        end
-        let!(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
-
-        before :each do
-          described_class.expects(:client).at_least_once.returns(connection)
-        end
-
-        it 'is expected to raise a RecordNotFound error' do
-          expect { described_class.request(':id', { id: 1 }, :get) }.to raise_error(Likeno::Errors::RecordNotFound)
-          faraday_stubs.verify_stubbed_calls
-        end
-      end
-    end
-
-    context 'with an unsuccessful request' do
-      let!(:stubs) { Faraday::Adapter::Test::Stubs.new { |stub| stub.get('/entities/1/exists') { [500, {}, {}] } } }
-      let(:connection) { Faraday.new { |builder| builder.adapter :test, stubs } }
-
-      before :each do
-        subject.class.expects(:client).at_least_once.returns(connection)
-      end
-
-      it 'is expected to raise a RequestError with the response' do
-        expect { subject.class.request(':id/exists', { id: 1 }, :get) }.to raise_error do |error|
-          expect(error).to be_a(Likeno::Errors::RequestError)
-          expect(error.response.status).to eq(500)
-          expect(error.response.body).to eq({})
-        end
-        stubs.verify_stubbed_calls
-      end
-    end
-  end
-
   describe 'to_hash' do
     it 'is expected to return an empty hash' do
       expect(subject.to_hash).to be_empty
@@ -262,11 +113,18 @@ describe Likeno::Entity do
   end
 
   describe 'save' do
-    it_behaves_like 'persistence method', :save, :post, false # false means Don't use ids in URLs
+    context 'persistance' do
+      before :each do
+        subject.expects(:instance_entity_name).at_least_once.returns('entity')
+      end
+
+      it_behaves_like 'persistence method', :save, :post, false # false means Don't use ids in URLs
+    end
 
     context 'with a successful response' do
       context 'when it is not persisted' do
         before :each do
+          subject.expects(:instance_entity_name).at_least_once.returns('entity')
           subject.class.expects(:request).at_least_once.with('', anything, :post, '')
             .returns('entity' => { 'id' => 42, 'errors' => [] })
         end
@@ -292,6 +150,10 @@ describe Likeno::Entity do
   end
 
   describe 'update' do
+    before :each do
+      subject.expects(:instance_entity_name).at_least_once.returns('entity')
+    end
+
     it_behaves_like 'persistence method', :update, :put
 
     context 'with valid parameters' do
@@ -337,6 +199,7 @@ describe Likeno::Entity do
 
     context 'with an existent id' do
       before :each do
+        subject.class.expects(:entity_name).at_least_once.returns('entity')
         subject.class.expects(:request).with(':id', has_entry(id: 42), :get)
           .returns('entity' => { 'id' => 42 })
       end
@@ -444,12 +307,20 @@ describe Likeno::Entity do
     subject { FactoryGirl.build(:model) }
 
     context 'with nil' do
+      before :each do
+        described_class.expects(:entity_name).at_least_once.returns('entity')
+      end
+
       it 'is expected to return an empty array' do
         expect(described_class.create_objects_array_from_hash('entities' => [])).to eq([])
       end
     end
 
     context 'with a Hash' do
+      before :each do
+        described_class.expects(:entity_name).at_least_once.returns('entity')
+      end
+
       it 'is expected to return the correspondent object to the given hash inside of an Array' do
         expect(described_class.create_objects_array_from_hash('entities' => {})).to eq([subject])
       end
@@ -473,6 +344,13 @@ describe Likeno::Entity do
       it 'is expected to return true' do
         expect(described_class.valid?('test')).to be_truthy
       end
+    end
+  end
+
+  describe 'instance_entity_name' do
+    it 'is expected to call its class equivalent method' do
+      subject.class.expects(:entity_name).returns('entities')
+      expect(subject.instance_entity_name)
     end
   end
 end
