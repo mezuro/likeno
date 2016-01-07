@@ -123,7 +123,7 @@ describe 'RequestMethods' do
     end
 
     context 'when the record was not found' do
-      context 'and or the status is 404' do
+      context "and the response doesn't have a NotFound error message" do
         let!(:faraday_stubs) do
           Faraday::Adapter::Test::Stubs.new do |stub|
             # stub.get receives arguments: path, headers, block
@@ -144,7 +144,7 @@ describe 'RequestMethods' do
         end
       end
 
-      context 'and or the response has a NotFound error message' do
+      context 'and the response has a NotFound error message' do
         let!(:faraday_stubs) do
           Faraday::Adapter::Test::Stubs.new do |stub|
             # stub.get receives arguments: path, headers, block
