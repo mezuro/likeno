@@ -145,11 +145,12 @@ describe 'RequestMethods' do
       end
 
       context 'and the response has a NotFound error message' do
+        let(:error_message) { { 'errors' => 'RecordNotFound' } }
         let!(:faraday_stubs) do
           Faraday::Adapter::Test::Stubs.new do |stub|
             # stub.get receives arguments: path, headers, block
             # The block should be a Array [status, headers, body]
-            stub.get('/entities/1') { [404, {}, { 'errors' => 'RecordNotFound' }] }
+            stub.get('/entities/1') { [404, {}, error_message] }
           end
         end
         let!(:connection) { Faraday.new { |builder| builder.adapter :test, faraday_stubs } }
@@ -159,8 +160,11 @@ describe 'RequestMethods' do
           TestRequester.expects(:endpoint).at_least_once.returns('entities')
         end
 
-        it 'is expected to raise a RecordNotFound error' do
-          expect { TestRequester.request(':id', { id: 1 }, :get) }.to raise_error(Likeno::Errors::RecordNotFound)
+        it 'is expected to raise a RecordNotFound error with the message' do
+          expect { TestRequester.request(':id', { id: 1 }, :get) }.to raise_error do |error|
+            expect(error).to be_a(Likeno::Errors::RecordNotFound)
+            expect(error.response.body).to eq error_message
+          end
           faraday_stubs.verify_stubbed_calls
         end
       end
