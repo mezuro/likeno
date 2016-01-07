@@ -171,21 +171,43 @@ describe 'RequestMethods' do
     end
 
     context 'with an unsuccessful request' do
-      let!(:stubs) { Faraday::Adapter::Test::Stubs.new { |stub| stub.get('/entities/1/exists') { [500, {}, {}] } } }
-      let(:connection) { Faraday.new { |builder| builder.adapter :test, stubs } }
+      context 'and no error message on the response' do
+        let!(:stubs) { Faraday::Adapter::Test::Stubs.new { |stub| stub.get('/entities/1/exists') { [500, {}, {}] } } }
+        let(:connection) { Faraday.new { |builder| builder.adapter :test, stubs } }
 
-      before :each do
-        TestRequester.expects(:client).at_least_once.returns(connection)
-        TestRequester.expects(:endpoint).at_least_once.returns('entities')
+        before :each do
+          TestRequester.expects(:client).at_least_once.returns(connection)
+          TestRequester.expects(:endpoint).at_least_once.returns('entities')
+        end
+
+        it 'is expected to raise a RequestError with the response habing an empty body' do
+          expect { TestRequester.request(':id/exists', { id: 1 }, :get) }.to raise_error do |error|
+            expect(error).to be_a(Likeno::Errors::RequestError)
+            expect(error.response.status).to eq(500)
+            expect(error.response.body).to eq({})
+          end
+          stubs.verify_stubbed_calls
+        end
       end
 
-      it 'is expected to raise a RequestError with the response' do
-        expect { TestRequester.request(':id/exists', { id: 1 }, :get) }.to raise_error do |error|
-          expect(error).to be_a(Likeno::Errors::RequestError)
-          expect(error.response.status).to eq(500)
-          expect(error.response.body).to eq({})
+      context 'with an error message on the response' do
+        let(:error_message) { { 'error' => 'InternalServerError'} }
+        let!(:stubs) { Faraday::Adapter::Test::Stubs.new { |stub| stub.get('/entities/1/exists') { [500, {}, error_message] } } }
+        let(:connection) { Faraday.new { |builder| builder.adapter :test, stubs } }
+
+        before :each do
+          TestRequester.expects(:client).at_least_once.returns(connection)
+          TestRequester.expects(:endpoint).at_least_once.returns('entities')
         end
-        stubs.verify_stubbed_calls
+
+        it 'is expected to raise a RequestError with the response and its error message' do
+          expect { TestRequester.request(':id/exists', { id: 1 }, :get) }.to raise_error do |error|
+            expect(error).to be_a(Likeno::Errors::RequestError)
+            expect(error.response.status).to eq(500)
+            expect(error.response.body).to eq(error_message)
+          end
+          stubs.verify_stubbed_calls
+        end
       end
     end
   end
