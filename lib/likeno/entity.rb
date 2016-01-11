@@ -2,8 +2,8 @@ require 'active_support/inflector'
 require 'faraday_middleware'
 require 'errors'
 require 'helpers/hash_converters'
-require 'helpers/request_methods'
 require 'helpers/crud_request_parameters'
+require 'likeno/request_methods'
 
 module Likeno
   class Entity
@@ -24,7 +24,7 @@ module Likeno
       hash
     end
 
-    extend RequestMethods
+    extend Likeno::RequestMethods
 
     def self.to_object(value)
       value.is_a?(Hash) ? new(value, true) : value
