@@ -1,13 +1,13 @@
 require 'yaml'
 require 'logger'
-require 'likeno/entity.rb'
+require 'likeno/entity'
 
 module Likeno
   @config = {}
 
   # Configure through hash
   def self.configure(opts = {})
-    opts.each { |name, address| @config[name.to_sym] = address }
+    @config = Hash[opts.map { |name, address| [name.to_sym, address] }]
   end
 
   # Configure through yaml file
@@ -20,7 +20,7 @@ module Likeno
       raise Psych::Exception, 'YAML configuration file contains invalid syntax.'
     end
 
-    configure(config)
+    configure(@config)
   end
 
   def self.config

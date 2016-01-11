@@ -11,7 +11,7 @@ describe Likeno do
   end
 
   context 'creating custom configuration' do
-    let(:config) { { address: 'http://localhost.address' } }
+    let(:config) { { 'address' => 'http://localhost.address' } }
 
     describe 'configure' do
       after :each do
@@ -20,7 +20,7 @@ describe Likeno do
 
       it 'should set the address' do
         Likeno.configure config
-        expect(Likeno.config[:address]).to eq(config[:address])
+        expect(Likeno.config[:address]).to eq(config['address'])
       end
     end
 
@@ -38,7 +38,7 @@ describe Likeno do
         it 'should set the config' do
           Likeno.configure_with(yml)
 
-          expect(Likeno.config[:address]).to eq(config[:address])
+          expect(Likeno.config[:address]).to eq(config['address'])
         end
       end
 

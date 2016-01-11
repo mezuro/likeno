@@ -15,10 +15,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'spec_helper'
-require 'helpers/request_methods'
+require 'likeno/request_methods'
 
 class Likeno::BaseTestRequester
-  extend RequestMethods
+  extend Likeno::RequestMethods
 end
 
 class TestRequester < Likeno::BaseTestRequester; end
