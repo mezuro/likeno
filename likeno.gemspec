@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'mocha'
   spec.add_development_dependency 'factory_girl', '~> 4.5.0'
   spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'codeclimate-test-reporter'
 
   spec.add_dependency 'faraday_middleware'
   spec.add_dependency 'activesupport', '>= 2.2.1'
