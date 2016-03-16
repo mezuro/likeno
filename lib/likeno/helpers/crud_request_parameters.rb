@@ -14,7 +14,54 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'errors/standard'
-require 'errors/request_error'
-require 'errors/record_not_found'
-require 'errors/record_invalid'
+
+module Likeno
+  module CRUDRequestParameters
+    def save_params
+      { instance_entity_name.underscore.to_sym => to_hash }
+    end
+
+    def save_action
+      ''
+    end
+
+    def save_prefix
+      ''
+    end
+
+    def destroy_action
+      ':id'
+    end
+    alias_method :update_action, :destroy_action
+
+    def destroy_params
+      { id: id }
+    end
+
+    def destroy_prefix
+      ''
+    end
+
+    def update_params
+      { instance_entity_name.underscore.to_sym => to_hash, :id => id }
+    end
+
+    def update_prefix
+      ''
+    end
+
+    module ClassMethods
+      def exists_action
+        ':id/exists'
+      end
+
+      def id_params(id)
+        { id: id }
+      end
+
+      def find_action
+        ':id'
+      end
+    end
+  end
+end

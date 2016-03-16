@@ -15,11 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'spec_helper'
-require 'helpers/hash_converters'
+require 'likeno/helpers/hash_converters'
 
-include HashConverters
+include Likeno::HashConverters
 
-describe HashConverters do
+describe Likeno::HashConverters do
   describe 'date_time_to_s' do
     context 'with 21/12/1995 (first Ruby publication)' do
       it 'is expected to return 1995-12-21T00:00:00.0/1+00:00' do

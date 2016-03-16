@@ -15,17 +15,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'spec_helper'
-require 'helpers/aggregation_options'
+require 'likeno/helpers/aggregation_options'
 
-include AggregationOptions
+include Likeno::AggregationOptions
 
-describe 'all_with_label' do
-  it 'should return the list of aggregation methods available' do
-    expect(all_with_label).to eq(
-      [
-        ["Mean","mean"], ["Median", "MEDIAN"], ["Maximum", "max"], ["Minimum", "min"],
-        ["Count", "COUNT"], ["Standard Deviation", "STANDARD_DEVIATION"]
-      ]
-    )
+describe Likeno::AggregationOptions do
+  describe 'all_with_label' do
+    it 'should return the list of aggregation methods available' do
+      expect(all_with_label).to eq(
+        [
+          ["Mean","mean"], ["Median", "MEDIAN"], ["Maximum", "max"], ["Minimum", "min"],
+          ["Count", "COUNT"], ["Standard Deviation", "STANDARD_DEVIATION"]
+        ]
+      )
+    end
   end
 end

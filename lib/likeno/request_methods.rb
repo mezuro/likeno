@@ -1,3 +1,7 @@
+require 'faraday'
+require 'faraday_middleware'
+require 'likeno/errors'
+
 module Likeno
   module RequestMethods
     def request(action, params = {}, method = :post, prefix = '')

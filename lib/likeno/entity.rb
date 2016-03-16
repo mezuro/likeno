@@ -1,9 +1,8 @@
 require 'active_support/inflector'
-require 'faraday_middleware'
-require 'errors'
-require 'helpers/hash_converters'
-require 'helpers/crud_request_parameters'
 require 'likeno/request_methods'
+require 'likeno/helpers/hash_converters'
+require 'likeno/helpers/crud_request_parameters'
+require 'likeno/errors'
 
 module Likeno
   class Entity

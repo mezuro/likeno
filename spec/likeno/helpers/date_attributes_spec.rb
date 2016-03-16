@@ -1,14 +1,14 @@
 require 'spec_helper'
-require 'helpers/date_attributes'
+require 'likeno/helpers/date_attributes'
 
-include DateAttributes
+include Likeno::DateAttributes
 
 class Klass
-  include DateAttributes
+  include Likeno::DateAttributes
 end
 
 
-describe 'DateAttributes' do
+describe Likeno::DateAttributes do
   subject { Klass.new }
   let(:time){ "2015-02-04T15:53:18.452Z" }
 
