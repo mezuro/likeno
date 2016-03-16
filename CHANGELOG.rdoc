@@ -1,0 +1,19 @@
+= Revision history for the Likeno gem
+
+Likeno is a library for remote data model access over HTTP
+
+== v0.0.1 (Initial version)
+
+Imported from KalibroClient (http://github.com/mezuro/kalibro_client)
+
+Features:
+
+* Data model access over HTTP
+    * Entity creation with POST
+    * Entity updates with POST
+    * Entity retrieval with GET
+    * Entity deletion with DELETE
+    * Methods for reading/writing to and from JSON and JSON arrays
+    * Basic validation and error accumulation support
+* Handling of basic HTTP errors with corresponding exceptions (in the errors module)
+* Helpers for date conversions and parameter generations
