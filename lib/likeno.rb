@@ -22,13 +22,15 @@ module Likeno
 
   # Configure through hash
   def self.configure(opts = {})
-    @config = Hash[opts.map { |name, address| [name.to_sym, address] }]
+    opts.each do |name, address|
+      @config[name.to_sym] = address
+    end
   end
 
   # Configure through yaml file
   def self.configure_with(path_to_yaml_file)
     begin
-      @config = Psych.load_file path_to_yaml_file
+      @config.merge!(Psych.load_file(path_to_yaml_file))
     rescue Errno::ENOENT
       raise Errno::ENOENT, "YAML configuration file couldn't be found."
     rescue Psych::Exception
