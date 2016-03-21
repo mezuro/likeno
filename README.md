@@ -69,3 +69,7 @@ end
 ```
 
 It returns a `hash` with the response body.
+
+## Versioning
+
+Kolekti follows the [semantic versioning](http://semver.org/) policy.
