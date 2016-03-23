@@ -201,9 +201,12 @@ describe Likeno::Entity do
   end
 
   describe 'find' do
+    let(:prefix) { '' }
+    let(:header) { {} }
+
     context 'with an inexistent id' do
       before :each do
-        subject.class.expects(:request).at_least_once.with(':id', has_entry(id: 0), :get)
+        subject.class.expects(:request).at_least_once.with(':id', has_entry(id: 0), :get, prefix, header)
           .raises(Likeno::Errors::RecordNotFound)
       end
 
@@ -215,7 +218,7 @@ describe Likeno::Entity do
     context 'with an existent id' do
       before :each do
         subject.class.expects(:entity_name).at_least_once.returns('entity')
-        subject.class.expects(:request).with(':id', has_entry(id: 42), :get)
+        subject.class.expects(:request).with(':id', has_entry(id: 42), :get, prefix, header)
           .returns('entity' => { 'id' => 42 })
       end
 
@@ -223,6 +226,21 @@ describe Likeno::Entity do
         expect(subject.class.find(42).id).to eq(42)
       end
     end
+    context 'passing a prefix and a header' do
+      let(:header) { { locale: 'pt_br' } }
+
+      before :each do
+        subject.class.expects(:entity_name).at_least_once.returns('entity')
+        subject.class.expects(:request)
+          .with(':id', has_entry(id: 42), :get, prefix, header)
+          .returns('entity' => { 'id' => 42 })
+      end
+
+      it 'is expected to return an empty model' do
+        expect(subject.class.find(42, prefix, header).id).to eq(42)
+      end
+    end
+  end
   end
 
   describe 'destroy' do
