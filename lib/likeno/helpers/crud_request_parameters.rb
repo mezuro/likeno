@@ -48,6 +48,13 @@ module Likeno
       ''
     end
 
+    def default_headers
+      {}
+    end
+    alias_method :save_headers, :default_headers
+    alias_method :destroy_headers, :default_headers
+    alias_method :update_headers, :default_headers
+
     module ClassMethods
       def exists_action
         ':id/exists'
@@ -60,6 +67,17 @@ module Likeno
       def find_action
         ':id'
       end
+
+      def find_prefix
+        ''
+      end
+      alias_method :exists_prefix, :find_prefix
+
+      def default_headers
+        {}
+      end
+      alias_method :find_headers, :default_headers
+      alias_method :exists_headers, :default_headers
     end
   end
 end
