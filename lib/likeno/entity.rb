@@ -95,9 +95,18 @@ module Likeno
       request(exists_action, id_params(id), :get)['exists']
     end
 
-    def self.find(id)
-      response = request(find_action, id_params(id), :get)
+    def self.find(id, prefix = '', headers = {})
+      response = request(find_action, id_params(id), :get, prefix, headers)
       new(response[entity_name], true)
+    end
+
+    def self.all(headers = {}, params = {})
+      action = ''
+      method = :get
+      prefix = ''
+
+      response = request(action, params, method, prefix, headers)
+      response.map { |record| new(record, true) }
     end
 
     def destroy
@@ -171,4 +180,3 @@ module Likeno
     include HashConverters
   end
 end
-
