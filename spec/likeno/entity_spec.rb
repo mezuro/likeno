@@ -70,7 +70,7 @@ describe Likeno::Entity do
 
     context 'when a record does not exist with given id' do
       before :each do
-        subject.class.expects(:request).with(url, params, http_method, '')
+        subject.class.expects(:request).with(url, params, http_method, '', {})
           .raises(Likeno::Errors::RecordNotFound)
       end
 
@@ -83,7 +83,7 @@ describe Likeno::Entity do
       before :each do
         error = Likeno::Errors::RequestError.new(response: mock(status: 500))
 
-        subject.class.expects(:request).with(url, params, http_method, '').raises(error)
+        subject.class.expects(:request).with(url, params, http_method, '', {}).raises(error)
       end
 
       it 'is expected to raise a RequestError error' do
@@ -95,7 +95,7 @@ describe Likeno::Entity do
       before :each do
         error = Likeno::Errors::RequestError.new(response: mock(status: 422, body: { 'errors' => errors }))
 
-        subject.class.expects(:request).with(url, params, http_method, '').raises(error)
+        subject.class.expects(:request).with(url, params, http_method, '', {}).raises(error)
       end
 
       context 'with a single error' do
@@ -140,7 +140,7 @@ describe Likeno::Entity do
       context 'when it is not persisted' do
         before :each do
           subject.expects(:instance_entity_name).at_least_once.returns('entity')
-          subject.class.expects(:request).at_least_once.with('', anything, :post, '')
+          subject.class.expects(:request).at_least_once.with('', anything, :post, '', {})
             .returns('entity' => { 'id' => 42, 'errors' => [] })
         end
 
@@ -176,7 +176,7 @@ describe Likeno::Entity do
         id = 42
 
         subject.expects(:id).at_least_once.returns(id)
-        described_class.expects(:request).with(':id', has_entry(id: id), :put, '')
+        described_class.expects(:request).with(':id', has_entry(id: id), :put, '', {})
           .returns('entity' => { 'id' => id, 'errors' => [] })
       end
 
@@ -203,7 +203,7 @@ describe Likeno::Entity do
   describe 'find' do
     context 'with an inexistent id' do
       before :each do
-        subject.class.expects(:request).at_least_once.with(':id', has_entry(id: 0), :get)
+        subject.class.expects(:request).at_least_once.with(':id', has_entry(id: 0), :get, '', {})
           .raises(Likeno::Errors::RecordNotFound)
       end
 
@@ -215,7 +215,7 @@ describe Likeno::Entity do
     context 'with an existent id' do
       before :each do
         subject.class.expects(:entity_name).at_least_once.returns('entity')
-        subject.class.expects(:request).with(':id', has_entry(id: 42), :get)
+        subject.class.expects(:request).with(':id', has_entry(id: 42), :get, '', {})
           .returns('entity' => { 'id' => 42 })
       end
 
@@ -225,13 +225,30 @@ describe Likeno::Entity do
     end
   end
 
+  describe 'all' do
+    let(:entity1) { {'id' => 1} }
+    let(:entity2) { {'id' => 2} }
+    before :each do
+      subject.class.expects(:entity_name).at_least_once.returns('entity')
+      subject.class.expects(:request).with('', {}, :get, '', {})
+        .returns('entities' => [entity1, entity2])
+    end
+
+    it 'is expected to return an instance list' do
+      response = subject.class.all
+      expect(response).to be_an(Array)
+      expect(response[0].id).to eq(1)
+      expect(response[1].id).to eq(2)
+    end
+  end
+
   describe 'destroy' do
     it_behaves_like 'persistence method', :destroy, :delete
 
     context 'when it gets successfully destroyed' do
       before :each do
         subject.expects(:id).at_least_once.returns(42)
-        described_class.expects(:request).with(':id', { id: subject.id }, :delete, '').returns({})
+        described_class.expects(:request).with(':id', { id: subject.id }, :delete, '', {}).returns({})
       end
 
       it 'is expected to remain with the errors array empty and not persisted' do
@@ -295,7 +312,7 @@ describe Likeno::Entity do
       before :each do
         described_class
           .expects(:request)
-          .with(':id/exists', { id: 0 }, :get)
+          .with(':id/exists', { id: 0 }, :get, '', {})
           .returns('exists' => false)
       end
 
@@ -308,7 +325,7 @@ describe Likeno::Entity do
       before :each do
         described_class
           .expects(:request)
-          .with(':id/exists', { id: 42 }, :get)
+          .with(':id/exists', { id: 42 }, :get, '', {})
           .returns('exists' => true)
       end
 
