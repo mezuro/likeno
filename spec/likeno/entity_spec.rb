@@ -225,6 +225,23 @@ describe Likeno::Entity do
     end
   end
 
+  describe 'all' do
+    let(:entity1) { {'id' => 1} }
+    let(:entity2) { {'id' => 2} }
+    before :each do
+      subject.class.expects(:entity_name).at_least_once.returns('entity')
+      subject.class.expects(:request).with('', {}, :get, '', {})
+        .returns('entities' => [entity1, entity2])
+    end
+
+    it 'is expected to return an instance list' do
+      response = subject.class.all
+      expect(response).to be_an(Array)
+      expect(response[0].id).to eq(1)
+      expect(response[1].id).to eq(2)
+    end
+  end
+
   describe 'destroy' do
     it_behaves_like 'persistence method', :destroy, :delete
 

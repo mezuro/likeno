@@ -68,16 +68,26 @@ module Likeno
         ':id'
       end
 
+      def all_action
+        ''
+      end
+
+      def all_params
+        {}
+      end
+
       def find_prefix
         ''
       end
       alias_method :exists_prefix, :find_prefix
+      alias_method :all_prefix, :find_prefix
 
       def default_headers
         {}
       end
       alias_method :find_headers, :default_headers
       alias_method :exists_headers, :default_headers
+      alias_method :all_headers, :default_headers
     end
   end
 end

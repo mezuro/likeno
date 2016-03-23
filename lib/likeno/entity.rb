@@ -100,6 +100,10 @@ module Likeno
       new(response[entity_name], true)
     end
 
+    def self.all
+      create_objects_array_from_hash request(all_action, all_params, :get, all_prefix, all_headers)
+    end
+
     def destroy
       without_request_error? do
         response = self.class.request(destroy_action, destroy_params, :delete, destroy_prefix, destroy_headers)
