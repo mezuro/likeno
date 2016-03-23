@@ -18,6 +18,14 @@ require 'likeno/helpers/hash_converters'
 
 include Likeno::HashConverters
 
+class Another
+  attr_accessor :attr
+
+  def to_hash
+    {'attr' => self.attr}
+  end
+end
+
 describe Likeno::HashConverters do
   describe 'date_time_to_s' do
     context 'with 21/12/1995 (first Ruby publication)' do
@@ -72,6 +80,18 @@ describe Likeno::HashConverters do
     context 'with a negative infinite Float' do
       it 'returns -INF' do
         expect(convert_to_hash(-1.0 / 0.0)).to eq('-INF')
+      end
+    end
+
+    context 'without a base class that responds to to_hash' do
+      let(:obj) { Another.new }
+
+      before do
+        obj.attr = "attribute"
+      end
+
+      it 'is expected to do the conversion' do
+        expect(convert_to_hash(obj)).to eq({'attr' => obj.attr})
       end
     end
   end

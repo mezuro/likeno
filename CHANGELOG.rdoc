@@ -4,6 +4,8 @@ Likeno is a library for remote data model access over HTTP
 
 == Unreleased
 
+* Generalize Hash conversion for non Likeno::Entity instances
+
 == v1.0.1 - 23/03/2016
 
 * Fix hash conversion

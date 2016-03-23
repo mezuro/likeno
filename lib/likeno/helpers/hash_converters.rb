@@ -25,7 +25,7 @@ module Likeno
     def convert_to_hash(value)
       return value if value.nil?
       return value.collect { |element| convert_to_hash(element) } if value.is_a? Array
-      return value.to_hash if value.is_a?(Likeno::Entity)
+      return value.to_hash if value.respond_to?(:to_hash)
       return date_time_to_s(value) if value.is_a? DateTime
       return 'INF' if value.is_a?(Float) && value.infinite? == 1
       return '-INF' if value.is_a?(Float) && value.infinite? == -1
