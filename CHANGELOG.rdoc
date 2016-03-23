@@ -4,6 +4,10 @@ Likeno is a library for remote data model access over HTTP
 
 == Unreleased
 
+== v1.0.1 - 23/03/2016
+
+* Fix hash conversion
+
 == v1.0.0 - 23/03/2016
 
 * Add support for custom headers for requests
