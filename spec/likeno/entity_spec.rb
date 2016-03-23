@@ -226,6 +226,7 @@ describe Likeno::Entity do
         expect(subject.class.find(42).id).to eq(42)
       end
     end
+
     context 'passing a prefix and a header' do
       let(:header) { { locale: 'pt_br' } }
 
@@ -241,6 +242,46 @@ describe Likeno::Entity do
       end
     end
   end
+
+  describe 'all' do
+    let(:action) { '' }
+    let(:params) { {} }
+    let(:prefix) { '' }
+    let(:headers) { {} }
+
+    context 'without records on the other side' do
+      before :each do
+        subject.class.expects(:request).with('', {}, :get, '', {}).returns([])
+      end
+
+      it 'is expected to return an empty array' do
+        expect(subject.class.all).to eq([])
+      end
+    end
+    context 'with records on the other side' do
+      before :each do
+        subject.class.expects(:request).with(action, params, :get, prefix, headers)
+          .returns([{ id: 1 }, { id: 2 }])
+      end
+
+      it 'is expected to return an array of entities' do
+        expect(subject.class.all.map(&:id)).to eq([1, 2])
+      end
+    end
+
+    context 'when passing params and headers' do
+      let(:headers) { { locale: 'pt_br' } }
+      let(:params) { { content: nil } }
+
+      before :each do
+        subject.class.expects(:request).with(action, params, :get, prefix, headers)
+          .returns([{ id: 1 }, { id: 2 }])
+      end
+
+      it 'is expected to send the params' do
+        expect(subject.class.all(headers, params).map(&:id)).to eq([1, 2])
+      end
+    end
   end
 
   describe 'destroy' do

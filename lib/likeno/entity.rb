@@ -100,6 +100,15 @@ module Likeno
       new(response[entity_name], true)
     end
 
+    def self.all(headers = {}, params = {})
+      action = ''
+      method = :get
+      prefix = ''
+
+      response = request(action, params, method, prefix, headers)
+      response.map { |record| new(record, true) }
+    end
+
     def destroy
       without_request_error? do
         response = self.class.request(destroy_action, destroy_params, :delete, destroy_prefix)
@@ -171,4 +180,3 @@ module Likeno
     include HashConverters
   end
 end
-
