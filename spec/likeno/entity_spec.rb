@@ -207,7 +207,7 @@ describe Likeno::Entity do
           .raises(Likeno::Errors::RecordNotFound)
       end
 
-      xit 'is expected to raise a RecordNotFound error' do
+      it 'is expected to raise a RecordNotFound error' do
         expect { subject.class.find(0) }.to raise_error(Likeno::Errors::RecordNotFound)
       end
     end
@@ -219,7 +219,7 @@ describe Likeno::Entity do
           .returns('entity' => { 'id' => 42 })
       end
 
-      xit 'is expected to return an empty model' do
+      it 'is expected to return an empty model' do
         expect(subject.class.find(42).id).to eq(42)
       end
     end
@@ -299,7 +299,7 @@ describe Likeno::Entity do
           .returns('exists' => false)
       end
 
-      xit 'is expected to return false' do
+      it 'is expected to return false' do
         expect(described_class.exists?(0)).to eq(false)
       end
     end
@@ -312,7 +312,7 @@ describe Likeno::Entity do
           .returns('exists' => true)
       end
 
-      xit 'is expected to return false' do
+      it 'is expected to return false' do
         expect(described_class.exists?(42)).to eq(true)
       end
     end

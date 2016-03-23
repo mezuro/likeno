@@ -67,6 +67,17 @@ module Likeno
       def find_action
         ':id'
       end
+
+      def find_prefix
+        ''
+      end
+      alias_method :exists_prefix, :find_prefix
+
+      def default_headers
+        {}
+      end
+      alias_method :find_headers, :default_headers
+      alias_method :exists_headers, :default_headers
     end
   end
 end

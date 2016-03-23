@@ -92,11 +92,11 @@ module Likeno
     end
 
     def self.exists?(id)
-      request(exists_action, id_params(id), :get)['exists']
+      request(exists_action, id_params(id), :get, exists_prefix, exists_headers)['exists']
     end
 
     def self.find(id)
-      response = request(find_action, id_params(id), :get)
+      response = request(find_action, id_params(id), :get, find_prefix, find_headers)
       new(response[entity_name], true)
     end
 
