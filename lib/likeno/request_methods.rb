@@ -19,7 +19,7 @@ require 'likeno/errors'
 
 module Likeno
   module RequestMethods
-    def request(action, params = {}, method = :post, prefix = '')
+    def request(action, params = {}, method = :post, prefix = '', headers = {})
       response = client.send(method) do |request|
         url = "/#{endpoint}/#{action}".gsub(':id', params[:id].to_s)
         url = "/#{prefix}#{url}" unless prefix.empty?
@@ -27,6 +27,8 @@ module Likeno
         request.body = params unless method == :get || params.empty?
         request.options.timeout = 300
         request.options.open_timeout = 300
+
+        headers.each { |(key, value)| request.headers[key] = value }
       end
 
       if response.success?

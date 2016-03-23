@@ -119,6 +119,20 @@ describe 'RequestMethods' do
           expect(response).to eq(exists_response)
         end
       end
+
+      context 'with a header' do
+        it 'is expected to make the request with the header included' do
+          # stub.get receives arguments: path, headers, block
+          # The block should be a Array [status, headers, body]
+          prefix = '' # without a prefix
+          faraday_stubs.get('/entities/1', locale: 'pt-br') { [200, {}, exists_response] }
+          response = TestRequester.request(
+            ':id', { id: 1 }, :get, prefix, locale: 'pt-br'
+          )
+
+          expect(response).to eq(exists_response)
+        end
+      end
     end
 
     context 'when the record was not found' do
