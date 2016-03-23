@@ -15,11 +15,15 @@
 
 require 'spec_helper'
 
+class NestedEntity < Likeno::Entity
+  attr_accessor :id
+end
+
 # Create a class that has the attribute assignment methods, since some methods expect they exist
 # (and usually the subclasses do that).
 
 class EntityTest < Likeno::Entity
-  attr_accessor :id, :created_at, :updated_at
+  attr_accessor :id, :created_at, :updated_at, :nested_entity
 end
 
 describe Likeno::Entity do
@@ -34,8 +38,23 @@ describe Likeno::Entity do
   end
 
   describe 'to_hash' do
-    it 'is expected to return an empty hash' do
-      expect(subject.to_hash).to be_empty
+    context 'when all the attributes are nil' do
+      it 'is expected to return an empty hash' do
+        expect(subject.to_hash).to be_empty
+      end
+    end
+
+    context 'when the object has nested attributes' do
+      subject { EntityTest.new }
+      before do
+        subject.id = 1
+        subject.nested_entity = NestedEntity.new
+        subject.nested_entity.id = 2
+      end
+
+      it 'is expected to return a hash with keys as the attribute name and values as the attribute values' do
+        expect(subject.to_hash).to eq({'id' => '1', 'nested_entity' => {'id' => '2'}})
+      end
     end
   end
 

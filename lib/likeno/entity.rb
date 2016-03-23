@@ -34,7 +34,7 @@ module Likeno
       excepts = options[:except].nil? ? [] : options[:except]
       excepts << 'likeno_errors'
       excepts << 'persisted'
-      fields.each { |field| field_to_hash(field).merge!(hash) unless excepts.include? field }
+      fields.each { |field| hash.merge!(field_to_hash(field)) unless excepts.include? field }
       hash
     end
 
