@@ -54,7 +54,7 @@ module Likeno
         update
       else
         without_request_error? do
-          response = self.class.request(save_action, save_params, :post, save_prefix)
+          response = self.class.request(save_action, save_params, :post, save_prefix, save_headers)
 
           self.id = response[instance_entity_name]["id"]
           self.created_at = response[instance_entity_name]["created_at"] unless response[instance_entity_name]["created_at"].nil?
@@ -78,7 +78,7 @@ module Likeno
     def update(attributes = {})
       attributes.each { |field, value| send("#{field}=", value) if self.class.valid?(field) }
       without_request_error? do
-        self.class.request(update_action, update_params, :put, update_prefix)
+        self.class.request(update_action, update_params, :put, update_prefix, update_headers)
       end
     end
 
@@ -102,7 +102,7 @@ module Likeno
 
     def destroy
       without_request_error? do
-        response = self.class.request(destroy_action, destroy_params, :delete, destroy_prefix)
+        response = self.class.request(destroy_action, destroy_params, :delete, destroy_prefix, destroy_headers)
         @persisted = false
       end
     end
