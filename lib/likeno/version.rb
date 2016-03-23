@@ -14,5 +14,5 @@
 # along with Likeno.  If not, see <http://www.gnu.org/licenses/>.
 
 module Likeno
-  VERSION = '0.0.1.rc2'
+  VERSION = '1.0.0'
 end
