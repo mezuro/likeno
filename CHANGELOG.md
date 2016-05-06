@@ -1,35 +1,35 @@
-= Revision history for the Likeno gem
+# Revision history for the Likeno gem
 
 Likeno is a library for remote data model access over HTTP
 
-== Unreleased
+## Unreleased
 
-== v1.1.0 - 23/03/2016
+## v1.1.0 - 23/03/2016
 
 * Generalize Hash conversion for non Likeno::Entity instances
 
-== v1.0.1 - 23/03/2016
+## v1.0.1 - 23/03/2016
 
 * Fix hash conversion
 
-== v1.0.0 - 23/03/2016
+## v1.0.0 - 23/03/2016
 
 * Add support for custom headers for requests
 * Add prefixing support on exists and find methods
 * Add new listing method all
 
-== v0.0.1 - 21/03/2016
+## v0.0.1 - 21/03/2016
 
 Imported from KalibroClient (http://github.com/mezuro/kalibro_client)
 
 Features:
 
 * Data model access over HTTP
-    * Entity creation with POST
-    * Entity updates with POST
-    * Entity retrieval with GET
-    * Entity deletion with DELETE
-    * Methods for reading/writing to and from JSON and JSON arrays
-    * Basic validation and error accumulation support
+  * Entity creation with POST
+  * Entity updates with POST
+  * Entity retrieval with GET
+  * Entity deletion with DELETE
+  * Methods for reading/writing to and from JSON and JSON arrays
+  * Basic validation and error accumulation support
 * Handling of basic HTTP errors with corresponding exceptions (in the errors module)
 * Helpers for date conversions and parameter generations
