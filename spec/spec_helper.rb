@@ -23,6 +23,11 @@ SimpleCov.start do
   add_group 'Helpers', 'lib/helpers'
 
   add_filter '/spec/'
+
+  # Minimum coverage is only desired on CI tools when building the environment. CI is a
+  # default environment variable used by Travis. For reference, see here:
+  # https://docs.travis-ci.com/user/environment-variables/#Default-Environment-Variables
+  minimum_coverage 100 if ENV["CI"] == 'true'
 end
 
 require "codeclimate-test-reporter"
