@@ -6,10 +6,7 @@
 
   You can easily install it through the Ruby Version Manager - RVM. Instructions on how to do it can be found at http://rvm.io
 
-  It is expected to work with:
-
-  - 2.1.5 Debian 8
-  - 2.0.0 CentOS 7
+  It is expected to work with rubies 2.2.2 and above.
 
   *NOTE:* If you are using the gnome-shell, or any derivate like terminator, you have to mark on your profile the option to use a "login bash".
 
