@@ -4,6 +4,8 @@ Likeno is a library for remote data model access over HTTP
 
 ## Unreleased
 
+* Drop Ruby older than 2.2.2 support
+
 ## v1.1.0 - 23/03/2016
 
 * Generalize Hash conversion for non Likeno::Entity instances
