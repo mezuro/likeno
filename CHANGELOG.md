@@ -1,6 +1,8 @@
 # Revision history for the Likeno gem
 
-Likeno is a library for remote data model access over HTTP
+Likeno is a library for remote data model access over HTTP.
+
+This file follows the standards defined by http://semver.org/.
 
 ## Unreleased
 
